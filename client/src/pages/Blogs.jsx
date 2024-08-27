@@ -1,9 +1,5 @@
-import React from 'react'
-
-function Blogs() {
+export default function Blogs() {
   return (
     <div>Blogs</div>
   )
 }
-
-export default Blogs
