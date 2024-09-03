@@ -6,7 +6,7 @@ import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 import Dashboard from './pages/Dashboard'
 import Header from './components/Header'
-import FooterCom from './components/Footer'
+import FooterCom from './components/Footer.jsx'
 
 export default function App() {
   return (
