@@ -19,7 +19,7 @@ export default function SignUp() {
       setErrorMessage("All fields are required");
       setTimeout(() => {
         setErrorMessage(null);
-      }, 4000);
+      }, 5000);
       return;
     }
 
@@ -42,6 +42,7 @@ export default function SignUp() {
 
     try {
       setLoading(true);
+      setErrorMessage(null);
       const res = await fetch("api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,18 +50,17 @@ export default function SignUp() {
       });
       const data = await res.json();
       if (data.success === false) {
+        setLoading(false);
         throw new Error(data.message);
       } else {
-        setErrorMessage(null);
-        setLoading(false);
         navigate("/sign-in");
       }
     } catch (error) {
+      setLoading(false);
       setErrorMessage(error.message);
       setTimeout(() => {
         setErrorMessage(null);
-        setLoading(false);
-      }, 4000);
+      }, 5000);
     }
   };
 
