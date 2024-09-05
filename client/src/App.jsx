@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
 import Blogs from './pages/Blogs'
@@ -19,7 +19,7 @@ export default function App() {
         <Route path='/sign-in' element={<SignIn />} />
         <Route path='/sign-up' element={<SignUp />} />
         <Route path='/dashboard' element={<Dashboard />} />
-        <Route path='*' element={<Home />} />
+        <Route path='*' element={<Navigate to={"/"} />} />
       </Routes>
       <FooterCom />
     </BrowserRouter>
