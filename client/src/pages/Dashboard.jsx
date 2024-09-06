@@ -21,8 +21,8 @@ export default function Dashboard() {
       <div className="md:w-56">
         <Sidebar />
       </div>
-      <div>
-        { tab === 'profile' && <Profile /> }
+      <div className="w-full">
+        { tab === 'profile' && <Profile className="" /> }
       </div>
     </div>
   )
