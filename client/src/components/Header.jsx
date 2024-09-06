@@ -1,13 +1,24 @@
 import { Navbar, TextInput, Button, Dropdown, Avatar } from "flowbite-react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineSearch } from "react-icons/ai";
-import { FaMoon } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { FaMoon, FaSun } from "react-icons/fa";
+import { useSelector, useDispatch } from "react-redux";
+import { toggleTheme } from "../state/theme/themeSlice";
 
 export default function Header() {
+
+  // dark mode change
+  const {activeTheme} = useSelector((state) => state.theme);
+  const dispatch = useDispatch();
+
   const path = useLocation().pathname;
   const {currentUser} = useSelector((state) => state.user)
-  console.log(currentUser)
+  
+
+  const handleTheme = () => {
+    dispatch(toggleTheme())
+  }
+
   return (
     <Navbar className="border-b-2">
       <Link to="/" className="self-center whitespace-nowrap text-sm
@@ -28,8 +39,17 @@ export default function Header() {
         <AiOutlineSearch className="self-center"></AiOutlineSearch>
       </Button>
       <div className="flex gap-2 md:order-2">
-      <Button className="w-12 h-10 hidden sm:inline" color='gray' pill>
-        <FaMoon className="self-center"></FaMoon>
+      <Button className="w-12 h-10 hidden sm:inline" color='gray' pill
+      onClick={handleTheme}
+      >
+        {
+          activeTheme === 'light' ? (
+            <FaMoon title="Dark mode" className="self-center"></FaMoon>
+          ): (
+            <FaSun title="Light mode" className="self-center"></FaSun>
+          )
+        }   
+        
       </Button>
       {currentUser ? (
         <Dropdown  
