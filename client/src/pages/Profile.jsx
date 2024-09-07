@@ -56,7 +56,12 @@ const Profile = () => {
         () => {
             getDownloadURL(uploadTask.snapshot.ref).then((downloadUrl) => {
                 setImageFileUrl(downloadUrl);
+
+                setTimeout(()=> {
+                    setImageFileUploadProgress(null)
+                }, 2000)
             })
+            
         }
     )
 
