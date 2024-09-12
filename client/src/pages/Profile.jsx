@@ -1,7 +1,7 @@
 import { Alert, Button, Modal, Spinner, TextInput } from "flowbite-react";
 import { useRef, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { HiOutlineExclamationCircle } from "react-icons/hi"
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 import {
   getStorage,
   getDownloadURL,
@@ -11,11 +11,18 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { updateStart, updateSucces, updateFailure, deleteStart, deleteSuccuss, 
-  deleteFailure, 
+import {
+  updateStart,
+  updateSucces,
+  updateFailure,
+  deleteStart,
+  deleteSuccuss,
+  deleteFailure,
   signOutStart,
   signOutSuccess,
-  signOutFailure,} from "../state/user/userSlice";
+  signOutFailure,
+} from "../state/user/userSlice";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -31,7 +38,7 @@ const Profile = () => {
 
   const [formdata, setFormdata] = useState({});
   const dispatch = useDispatch();
-  const [userUpdateError, setUserUpdateError] = useState(null)
+  const [userUpdateError, setUserUpdateError] = useState(null);
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -42,7 +49,6 @@ const Profile = () => {
   };
 
   const uploadImage = async () => {
-
     setImageFileUploading(true);
     setImageFileUploadError(null);
     const storage = getStorage(app);
@@ -93,10 +99,10 @@ const Profile = () => {
     }
 
     setUserUpdateError(null);
-    setUserUpdateSuccessfull(null)
+    setUserUpdateSuccessfull(null);
 
     try {
-      dispatch(updateStart())
+      dispatch(updateStart());
       const res = await fetch(`api/user/update/${currentUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -104,14 +110,14 @@ const Profile = () => {
       });
       const data = await res.json();
       if (!res.ok) {
-        dispatch(updateFailure(data.message))
+        dispatch(updateFailure(data.message));
         setUserUpdateError(error);
       } else {
-        dispatch(updateSucces(data))
-        setUserUpdateSuccessfull("Profile updated successfuly")
+        dispatch(updateSucces(data));
+        setUserUpdateSuccessfull("Profile updated successfuly");
       }
     } catch (err) {
-      dispatch(updateFailure(err.message))
+      dispatch(updateFailure(err.message));
       setUserUpdateError(error);
     }
   };
@@ -119,36 +125,36 @@ const Profile = () => {
   const handleDeleteUser = async () => {
     setShowModal(false);
     try {
-      dispatch(deleteStart())
+      dispatch(deleteStart());
       const result = await fetch(`/api/user/delete/${currentUser._id}`, {
-        method:'DELETE',
+        method: "DELETE",
       });
       const data = await result.json();
       if (result.ok) {
-        dispatch(deleteSuccuss(data))
+        dispatch(deleteSuccuss(data));
       } else {
-        dispatch(deleteFailure(data.message))
+        dispatch(deleteFailure(data.message));
       }
     } catch (error) {
       dispatch(deleteFailure(error.message));
     }
-  }
+  };
 
   const handleSignout = async () => {
     try {
-      const res = await fetch('/api/user/signout', {
-        method:"POST"
-      })
+      const res = await fetch("/api/user/signout", {
+        method: "POST",
+      });
       const data = await res.json();
       if (res.ok) {
-         dispatch(signOutSuccess())
+        dispatch(signOutSuccess());
       } else {
-        dispatch(signOutFailure(data.message))
+        dispatch(signOutFailure(data.message));
       }
     } catch (err) {
-      dispatch(signOutFailure(err.message))
+      dispatch(signOutFailure(err.message));
     }
-  }
+  };
 
   return (
     <div className="w-full mx-auto max-w-4xl p-4 space-y-5">
@@ -209,7 +215,7 @@ const Profile = () => {
           </div>
         </div>
         {imageFileUploaError && (
-          <Alert  color={"failure"}>{imageFileUploaError}</Alert>
+          <Alert color={"failure"}>{imageFileUploaError}</Alert>
         )}
         <TextInput
           type="text"
@@ -247,49 +253,99 @@ const Profile = () => {
             });
           }}
         />
-        <Button type="submit" gradientDuoTone={"purpleToBlue"} 
-        disabled={loading || imageFileUploading}
-        outline>
+        <Button
+          type="submit"
+          gradientDuoTone={"purpleToBlue"}
+          disabled={loading || imageFileUploading}
+          outline
+        >
           {loading ? (
-                <>
-                <Spinner size="sm" />
-                <span className="text-sm text-white pl-3">Saving...</span>
-              </>
-              ) : (
-                'Save Changes'
-              )}
+            <>
+              <Spinner size="sm" />
+              <span className="text-sm text-white pl-3">Saving...</span>
+            </>
+          ) : (
+            "Save Changes"
+          )}
         </Button>
+        {
+          currentUser && currentUser.isAdmin && (
+            <Link className="w-full" to={"/create-post"}>
+              <Button className="w-full" gradientDuoTone="purpleToPink">Create a Post</Button>
+            </Link>
+          )
+        }
       </form>
-        {userUpdateError && (
-          <Alert className="mt-5" color={"failure"}>{userUpdateError}</Alert>
-        )}
-        {userUpdateSuccessfull && (
-          <Alert className="mt-5" color={"success"}>{userUpdateSuccessfull}</Alert>
-        )}
-        {error && (
-          <Alert className="mt-5" color={"failure"}>{error}</Alert>
-        )}
+      {userUpdateError && (
+        <Alert className="mt-5" color={"failure"}>
+          {userUpdateError}
+        </Alert>
+      )}
+      {userUpdateSuccessfull && (
+        <Alert className="mt-5" color={"success"}>
+          {userUpdateSuccessfull}
+        </Alert>
+      )}
+      {error && (
+        <Alert className="mt-5" color={"failure"}>
+          {error}
+        </Alert>
+      )}
       <div className="text-sm text-red-500 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2">
         <span
-        onClick={() => {setShowModal(true)}}
-        className="cursor-pointer">Delete Account</span>
+          onClick={() => {
+            setShowModal(true);
+          }}
+          className="cursor-pointer"
+        >
+          Delete Account
+        </span>
         <span
-        onClick={() => {handleSignout()}}
-        className="cursor-pointer">Sign Out</span>
+          onClick={() => {
+            handleSignout();
+          }}
+          className="cursor-pointer"
+        >
+          Sign Out
+        </span>
       </div>
-      <Modal show={showModal}
-      className="bg-blend-darken" 
-      onClose={() => {setShowModal(false)}} 
-      popup 
-      size={"md"}>
+      <Modal
+        show={showModal}
+        className="bg-blend-darken"
+        onClose={() => {
+          setShowModal(false);
+        }}
+        popup
+        size={"md"}
+      >
         <Modal.Header />
         <Modal.Body clas>
           <div className="text-center">
-            <HiOutlineExclamationCircle className="text-gray-400 dark:text-gray-200 mx-auto mb-2" size={50} />
-            <h3 className="text-lg text-gray-500 dark:text-gray-400 mb-4">Are you sure you want to delete your account?</h3>
+            <HiOutlineExclamationCircle
+              className="text-gray-400 dark:text-gray-200 mx-auto mb-2"
+              size={50}
+            />
+            <h3 className="text-lg text-gray-500 dark:text-gray-400 mb-4">
+              Are you sure you want to delete your account?
+            </h3>
             <div className="flex justify-center gap-2">
-              <Button onClick={() => {handleDeleteUser}} color={"failure"}>Yes, I&#39;m sure</Button>
-              <Button onClick={() => {setShowModal(false)}} color={""} outline>No, cancel</Button>
+              <Button
+                onClick={() => {
+                  handleDeleteUser;
+                }}
+                color={"failure"}
+              >
+                Yes, I&#39;m sure
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                }}
+                color={""}
+                outline
+              >
+                No, cancel
+              </Button>
             </div>
           </div>
         </Modal.Body>

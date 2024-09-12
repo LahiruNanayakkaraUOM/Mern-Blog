@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 const DashSidebar = () => {
 
   const location = useLocation();
+  const {currentUser} = useSelector((state) => state.user)
   const [tab, setTab] = useState("");
   const dispatch = useDispatch();
 
@@ -41,7 +42,7 @@ const DashSidebar = () => {
       <Sidebar.Items>
         <Sidebar.ItemGroup>
           <Link to={"/dashboard?tab=profile"}>
-          <Sidebar.Item active={tab==='profile'} icon={HiUser} label={"User"} labelColor="dark" as="div">
+          <Sidebar.Item active={tab==='profile'} icon={HiUser} label={currentUser.isAdmin?"Admin":"User"} labelColor="dark" as="div">
             Profile
           </Sidebar.Item>
           </Link>
