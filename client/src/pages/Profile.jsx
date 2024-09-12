@@ -11,7 +11,11 @@ import {
 import { app } from "../firebase";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import { updateStart, updateSucces, updateFailure, deleteStart, deleteSuccuss, deleteFailure} from "../state/user/userSlice";
+import { updateStart, updateSucces, updateFailure, deleteStart, deleteSuccuss, 
+  deleteFailure, 
+  signOutStart,
+  signOutSuccess,
+  signOutFailure,} from "../state/user/userSlice";
 
 const Profile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -127,6 +131,22 @@ const Profile = () => {
       }
     } catch (error) {
       dispatch(deleteFailure(error.message));
+    }
+  }
+
+  const handleSignout = async () => {
+    try {
+      const res = await fetch('/api/user/signout', {
+        method:"POST"
+      })
+      const data = await res.json();
+      if (res.ok) {
+         dispatch(signOutSuccess())
+      } else {
+        dispatch(signOutFailure(data.message))
+      }
+    } catch (err) {
+      dispatch(signOutFailure(err.message))
     }
   }
 
@@ -253,7 +273,9 @@ const Profile = () => {
         <span
         onClick={() => {setShowModal(true)}}
         className="cursor-pointer">Delete Account</span>
-        <span className="cursor-pointer">Sign Out</span>
+        <span
+        onClick={() => {handleSignout()}}
+        className="cursor-pointer">Sign Out</span>
       </div>
       <Modal show={showModal}
       className="bg-blend-darken" 
