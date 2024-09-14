@@ -27,7 +27,7 @@ export default function App() {
         <Route element={<AdminPrivateRoute />}>
           <Route path='/create-post' element={<CreatePost />} />
         </Route>
-        <Route path='*' element={<Navigate to={"/"} />} />
+        {/* <Route path='*' element={<Navigate to={"/"} />} /> */}
       </Routes>
       <FooterCom />
     </BrowserRouter>
