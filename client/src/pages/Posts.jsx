@@ -1,4 +1,5 @@
 import {
+  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -8,13 +9,15 @@ import {
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { BarLoader, PulseLoader, ScaleLoader } from "react-spinners";
+import { PulseLoader } from "react-spinners";
 
 const Posts = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(false);
+  const [showMore, setShowMore] = useState(true);
+
   const fetchPosts = async () => {
     try {
       setLoading(true);
@@ -25,6 +28,9 @@ const Posts = () => {
         setUserPosts(data.posts);
         setLoading(false);
         setFetched(true);
+        if (data.totalPosts <= 9) {
+          setShowMore(false);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -40,6 +46,27 @@ const Posts = () => {
       setFetched(true);
     }
   }, [currentUser._id]);
+
+  const handleShowMore = async () => {
+    const startIndex = userPosts.length;
+    try {
+      setLoading(true)
+      const res = await fetch(
+        `/api/post/getposts?userId${currentUser._id}&startIndex=${startIndex}`
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setUserPosts((prev) => [...prev, ...data.posts]);
+        if (data.posts.length < 9) {
+          setShowMore(false);
+        }
+      }
+      setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      console.log(error.message);
+    }
+  };
 
   return (
     <div
@@ -102,6 +129,20 @@ const Posts = () => {
               ))}
             </TableBody>
           </Table>
+          {showMore && (
+            <button
+              onClick={handleShowMore}
+              className="w-full text-teal-500 self-center text-sm py-7"
+            >
+              {
+                loading ? (
+                  <Spinner size="sm" />
+                ):(
+                  <span>Show more</span>
+                )
+              }
+            </button>
+          )}
         </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
