@@ -5,11 +5,14 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Button,
+  Modal,
 } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { PulseLoader } from "react-spinners";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 const Posts = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -17,6 +20,8 @@ const Posts = () => {
   const [loading, setLoading] = useState(false);
   const [fetched, setFetched] = useState(false);
   const [showMore, setShowMore] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [postIdToDelete, setPostIdToDelete] = useState(null);
 
   const fetchPosts = async () => {
     try {
@@ -50,7 +55,7 @@ const Posts = () => {
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
     try {
-      setLoading(true)
+      setLoading(true);
       const res = await fetch(
         `/api/post/getposts?userId${currentUser._id}&startIndex=${startIndex}`
       );
@@ -61,10 +66,32 @@ const Posts = () => {
           setShowMore(false);
         }
       }
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.log(error.message);
+    }
+  };
+
+  const handleDeletePost = async () => {
+    setShowModal(false);
+    try {
+      const res = await fetch(
+        `/api/post/delete/${postIdToDelete}/${currentUser._id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        setUserPosts((prev) =>
+          prev.filter((post) => post._id !== postIdToDelete)
+        );
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -88,7 +115,7 @@ const Posts = () => {
             <TableBody className="divide-y">
               {userPosts.map((post) => (
                 <TableRow
-                  key={post}
+                  key={post._id}
                   className="bg-white dark:border-gray-700 dark:bg-gray-800"
                 >
                   <TableCell>
@@ -113,7 +140,13 @@ const Posts = () => {
                   </TableCell>
                   <TableCell>{post.category}</TableCell>
                   <TableCell>
-                    <span className="text-red-500 hover:text-red-400 font-medium cursor-pointer">
+                    <span
+                      className="text-red-500 hover:text-red-400 font-medium cursor-pointer"
+                      onClick={() => {
+                        setShowModal(true);
+                        setPostIdToDelete(post._id);
+                      }}
+                    >
                       Delete
                     </span>
                   </TableCell>
@@ -134,13 +167,7 @@ const Posts = () => {
               onClick={handleShowMore}
               className="w-full text-teal-500 self-center text-sm py-7"
             >
-              {
-                loading ? (
-                  <Spinner size="sm" />
-                ):(
-                  <span>Show more</span>
-                )
-              }
+              {loading ? <Spinner size="sm" /> : <span>Show more</span>}
             </button>
           )}
         </div>
@@ -150,6 +177,42 @@ const Posts = () => {
           {fetched && <h2 className="text-2xl">You have no posts to show!</h2>}
         </div>
       )}
+      <Modal
+        show={showModal}
+        className="bg-blend-darken"
+        onClose={() => {
+          setShowModal(false);
+        }}
+        popup
+        size={"md"}
+      >
+        <Modal.Header />
+        <Modal.Body clas>
+          <div className="text-center">
+            <HiOutlineExclamationCircle
+              className="text-gray-400 dark:text-gray-200 mx-auto mb-2"
+              size={50}
+            />
+            <h3 className="text-lg text-gray-500 dark:text-gray-400 mb-4">
+              Are you sure you want to delete this post?
+            </h3>
+            <div className="flex justify-center gap-2">
+              <Button onClick={handleDeletePost} color={"failure"}>
+                Yes, I&#39;m sure
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowModal(false);
+                }}
+                color={""}
+                outline
+              >
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
