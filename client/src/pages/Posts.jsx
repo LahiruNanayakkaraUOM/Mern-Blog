@@ -153,7 +153,7 @@ const Posts = () => {
                   <TableCell>
                     <Link
                       className="text-teal-500 hover:text-teal-400 font-medium cursor-pointer"
-                      to={`/update-post/${post.slug}`}
+                      to={`/update-post/${post._id}`}
                     >
                       <span>Edit</span>
                     </Link>
@@ -187,7 +187,7 @@ const Posts = () => {
         size={"md"}
       >
         <Modal.Header />
-        <Modal.Body clas>
+        <Modal.Body>
           <div className="text-center">
             <HiOutlineExclamationCircle
               className="text-gray-400 dark:text-gray-200 mx-auto mb-2"

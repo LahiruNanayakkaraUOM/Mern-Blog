@@ -319,7 +319,7 @@ const Profile = () => {
         size={"md"}
       >
         <Modal.Header />
-        <Modal.Body clas>
+        <Modal.Body>
           <div className="text-center">
             <HiOutlineExclamationCircle
               className="text-gray-400 dark:text-gray-200 mx-auto mb-2"
