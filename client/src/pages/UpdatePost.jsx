@@ -156,8 +156,9 @@ const UpdatePost = () => {
                 onChange={(e) => {
                   setFormData({ ...formdata, category: e.target.value });
                 }}
+                defaultValue={formdata.ca}
               >
-                <option value={"uncategorized"} disabled>
+                <option value="uncategorized">
                   Select a category
                 </option>
                 {postCategories.map((item) => {
