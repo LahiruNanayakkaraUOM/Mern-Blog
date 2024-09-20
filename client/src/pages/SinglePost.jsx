@@ -2,6 +2,7 @@ import { Button } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PulseLoader } from "react-spinners";
+import CommentSection from "./CommentSection";
 
 const SinglePost = () => {
   const { postSlug } = useParams();
@@ -58,7 +59,11 @@ const SinglePost = () => {
           {post && (post.content.length / 100).toFixed(0)} mins read
         </span>
       </div>
-      <div className="p-3 w-full post-content" dangerouslySetInnerHTML={{ __html: post && post.content }}></div>
+      <div
+        className="p-3 w-full post-content mb-10"
+        dangerouslySetInnerHTML={{ __html: post && post.content }}
+      ></div>
+      <CommentSection postId={post && post._id} />
     </div>
   );
 };
