@@ -1,11 +1,13 @@
 import {
+  Alert,
   Button,
   Rating,
   RatingStar,
+  Spinner,
   Textarea,
   TextInput,
 } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -14,8 +16,52 @@ const CommentSection = ({ postId }) => {
   const [comment, setComment] = useState("");
   const [characterCount, setCharacterCount] = useState(200);
   const [rate, setRate] = useState(0);
+  const [formData, setFormData] = useState({});
+  const [formError, setFormError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async () => {};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setFormError(null);
+    setFormData({ ...formData, userId: currentUser._id, postId });
+    if (formData.rate === 0) {
+      setSubmitting(false);
+      return setFormError("Please rate this post");
+    }
+    if (!comment) {
+      setSubmitting(false);
+      return setFormError("Please add your comment");
+    }
+    try {
+      const res = await fetch("/api/comment/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setSubmitting(false);
+        setFormError(data.message);
+      } else {
+        setSubmitting(false);
+        setFormError(null);
+        setComment("");
+        setFormData({});
+        setRate(0);
+      }
+    } catch (error) {
+      setSubmitting(false);
+      setFormError(error.message);
+    }
+  };
+
+  useEffect(() => {
+    formData.rate = rate;
+  }, [rate]);
 
   return (
     <div className="max-w-3xl mx-auto w-full p-3">
@@ -96,16 +142,24 @@ const CommentSection = ({ postId }) => {
             maxLength={200}
             onChange={(e) => {
               setComment(e.target.value);
+              setFormData({ ...formData, content: e.target.value });
               setCharacterCount(200 - e.target.value.length);
             }}
             value={comment}
           />
+          {formError && (
+            <Alert className="mt-5" color={"failure"}>
+              {formError}
+            </Alert>
+          )}
           <div className="flex items-center justify-between mt-5">
             <p className="text-gray-500 text-sm">
               {characterCount} characters remaining
             </p>
             <Button type="submit" gradientDuoTone={"purpleToBlue"} outline>
-              Submit
+              {
+                submitting ? (<Spinner size={'sm'} />) : ("Submit")
+              }
             </Button>
           </div>
         </form>
