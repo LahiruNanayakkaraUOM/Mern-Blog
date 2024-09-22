@@ -115,6 +115,14 @@ const CommentSection = ({ postId }) => {
     }
   };
 
+  const handleEdit = async (comment, editedContent) => {
+    setCommentsRes(
+      commentsRes.map((c) =>
+        c._id === comment._id ? { ...c, content: editedContent } : c
+      )
+    );
+  };
+
   return (
     <div className="max-w-3xl mx-auto w-full p-3">
       {currentUser ? (
@@ -230,6 +238,7 @@ const CommentSection = ({ postId }) => {
                   commentVal={comVal}
                   key={comVal._id || Math.random()}
                   onLike={handleLike}
+                  onEdit={handleEdit}
                 />
               );
             })}

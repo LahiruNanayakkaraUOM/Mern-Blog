@@ -1,12 +1,15 @@
-import { Rating, RatingStar } from "flowbite-react";
+import { Button, Rating, RatingStar, Spinner, Textarea } from "flowbite-react";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
-const CommentCard = ({ commentVal, onLike }) => {
+const CommentCard = ({ commentVal, onLike, onEdit }) => {
   const [user, setUser] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
+  const [isEditable, setIsEditable] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [editedContent, setEditedContent] = useState(commentVal.content);
 
   const fetchUser = async () => {
     try {
@@ -23,6 +26,31 @@ const CommentCard = ({ commentVal, onLike }) => {
   useEffect(() => {
     fetchUser();
   }, [commentVal]);
+
+  const handleSubmit = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/comment/editComment/${commentVal._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: editedContent }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setIsSaving(false);
+        setIsEditable(false);
+        onEdit(commentVal, editedContent);
+      } else {
+        console.log(data.message);
+        setIsSaving(false);
+      }
+    } catch (error) {
+      setIsSaving(false);
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex gap-2 p-3 shadow-sm">
@@ -66,29 +94,74 @@ const CommentCard = ({ commentVal, onLike }) => {
             />
           </Rating>
         </div>
-        <p className="text-sm text-gray-500 dark:text-gray-200">
-          {commentVal.content}
-        </p>
-        <div className="flex items-center mt-2 pt-2 border-t dark:border-gray-700 max-w-fit gap-2">
-          <button
-            type="button"
-            className={`text-gray-400 hover:text-blue-500 ${
-              currentUser &&
-              commentVal &&
-              commentVal.likes &&
-              commentVal.likes.includes(currentUser._id) &&
-              "!text-blue-500"
-            }`}
-            onClick={() => {
-              onLike(commentVal._id);
-            }}
-          >
-            <FaThumbsUp className="text-sm" />
-          </button>
-          <span className="text-xs text-gray-500 dark:text-gray-300">
-            {commentVal.noOfLikes > 0 && commentVal.noOfLikes + " Likes"}
-          </span>
-        </div>
+
+        {isEditable ? (
+          <div className="flex flex-col items-end gap-2">
+            <Textarea
+              rows={3}
+              defaultValue={editedContent}
+              onChange={(e) => {
+                setEditedContent(e.target.value);
+              }}
+            />
+            <div className="flex gap-2">
+              <Button
+                onClick={handleSubmit}
+                gradientDuoTone={"purpleToBlue"}
+                size={"sm"}
+              >
+                {isSaving ? <Spinner size={"sm"} /> : "Save"}
+              </Button>
+              <Button
+                onClick={() => {
+                  setIsEditable(!isEditable);
+                }}
+                gradientDuoTone={"purpleToBlue"}
+                size={"sm"}
+                outline
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div>
+            <p className="text-sm text-gray-500 dark:text-gray-200">
+              {commentVal.content}
+            </p>
+            <div className="flex items-center mt-2 pt-2 border-t dark:border-gray-700 max-w-fit gap-2">
+              <button
+                type="button"
+                className={`text-gray-400 hover:text-blue-500 ${
+                  currentUser &&
+                  commentVal &&
+                  commentVal.likes &&
+                  commentVal.likes.includes(currentUser._id) &&
+                  "!text-blue-500"
+                }`}
+                onClick={() => {
+                  onLike(commentVal._id);
+                }}
+              >
+                <FaThumbsUp className="text-sm" />
+              </button>
+              <span className="text-xs text-gray-500 dark:text-gray-300">
+                {commentVal.noOfLikes > 0 && commentVal.noOfLikes + " Likes"}
+              </span>
+              {((currentUser && currentUser._id === commentVal.userId) ||
+                currentUser.isAdmin) && (
+                <span
+                  onClick={() => {
+                    setIsEditable(!isEditable);
+                  }}
+                  className="text-xs hover:text-blue-500 cursor-pointer"
+                >
+                  Edit
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
