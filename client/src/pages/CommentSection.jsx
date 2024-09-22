@@ -9,7 +9,7 @@ import {
 } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CommentCard from "../components/CommentCard";
 
 const CommentSection = ({ postId }) => {
@@ -20,6 +20,7 @@ const CommentSection = ({ postId }) => {
   const [formError, setFormError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [commentsRes, setCommentsRes] = useState([]);
+  const navigate = useNavigate();
 
   const fetchComments = async () => {
     try {
@@ -84,6 +85,35 @@ const CommentSection = ({ postId }) => {
   useEffect(() => {
     fetchComments();
   }, [postId]);
+
+  const handleLike = async (commentId) => {
+    try {
+      if (!currentUser) {
+        navigate("/sign-in");
+      }
+      const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+        method: "PUT",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setCommentsRes(
+          commentsRes.map((com) => {
+            if (com._id === commentId) {
+              return {
+                ...com,
+                likes: data.likes,
+                noOfLikes: data.noOfLikes,
+              };
+            } else {
+              return com;
+            }
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto w-full p-3">
@@ -194,8 +224,14 @@ const CommentSection = ({ postId }) => {
         </div>
         <div className="my-3">
           {commentsRes &&
-            commentsRes.map((comment) => {
-              return <CommentCard comment={comment} key={comment._id || Math.random()} />;
+            commentsRes.map((comVal) => {
+              return (
+                <CommentCard
+                  commentVal={comVal}
+                  key={comVal._id || Math.random()}
+                  onLike={handleLike}
+                />
+              );
             })}
         </div>
       </div>

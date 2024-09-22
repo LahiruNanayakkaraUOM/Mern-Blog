@@ -3,11 +3,13 @@ import { verifyToken } from "../utils/verifyUser.js";
 import {
   createComment,
   getComments,
+  likeComment,
 } from "../controllers/comment.controller.js";
 
 const router = express.Router();
 
 router.post("/create", verifyToken, createComment);
 router.get("/getcomments/:postId", getComments);
+router.put("/likeComment/:commentId",verifyToken, likeComment);
 
 export default router;

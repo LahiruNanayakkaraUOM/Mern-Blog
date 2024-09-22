@@ -37,3 +37,24 @@ export const getComments = async (req, res, next) => {
     next(error);
   }
 };
+
+export const likeComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId);
+    if (!comment) {
+      return next(errorHandler(404, "Comment not found"));
+    }
+    const index = comment.likes.indexOf(req.user.id);
+    if (index === -1) {
+      comment.noOfLikes += 1;
+      comment.likes.push(req.user.id);
+    } else {
+      comment.noOfLikes -= 1;
+      comment.likes.splice(index, 1);
+    }
+    await comment.save();
+    res.status(200).json(comment);
+  } catch (error) {
+    next(error);
+  }
+};
