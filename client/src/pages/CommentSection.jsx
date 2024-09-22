@@ -10,22 +10,36 @@ import {
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import CommentCard from "../components/CommentCard";
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector((state) => state.user);
   const [comment, setComment] = useState("");
   const [characterCount, setCharacterCount] = useState(200);
   const [rate, setRate] = useState(0);
-  const [formData, setFormData] = useState({});
   const [formError, setFormError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [commentsRes, setCommentsRes] = useState([]);
+
+  const fetchComments = async () => {
+    try {
+      const res = await fetch(`/api/comment/getcomments/${postId}`);
+      const data = await res.json();
+      if (res.ok) {
+        setCommentsRes(data);
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     setFormError(null);
-    setFormData({ ...formData, userId: currentUser._id, postId });
-    if (formData.rate === 0) {
+    if (rate === 0) {
       setSubmitting(false);
       return setFormError("Please rate this post");
     }
@@ -34,24 +48,32 @@ const CommentSection = ({ postId }) => {
       return setFormError("Please add your comment");
     }
     try {
+      const commentData = {
+        rate,
+        content: comment,
+        postId,
+        userId: currentUser._id,
+      };
+
       const res = await fetch("/api/comment/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(commentData),
       });
       const data = await res.json();
 
-      if (!res.ok) {
-        setSubmitting(false);
-        setFormError(data.message);
-      } else {
+      if (res.ok) {
+        setCommentsRes([commentData, ...commentsRes]);
         setSubmitting(false);
         setFormError(null);
         setComment("");
-        setFormData({});
+
         setRate(0);
+      } else if (!res.ok) {
+        setSubmitting(false);
+        setFormError(data.message);
       }
     } catch (error) {
       setSubmitting(false);
@@ -60,8 +82,8 @@ const CommentSection = ({ postId }) => {
   };
 
   useEffect(() => {
-    formData.rate = rate;
-  }, [rate]);
+    fetchComments();
+  }, [postId]);
 
   return (
     <div className="max-w-3xl mx-auto w-full p-3">
@@ -142,7 +164,6 @@ const CommentSection = ({ postId }) => {
             maxLength={200}
             onChange={(e) => {
               setComment(e.target.value);
-              setFormData({ ...formData, content: e.target.value });
               setCharacterCount(200 - e.target.value.length);
             }}
             value={comment}
@@ -157,13 +178,27 @@ const CommentSection = ({ postId }) => {
               {characterCount} characters remaining
             </p>
             <Button type="submit" gradientDuoTone={"purpleToBlue"} outline>
-              {
-                submitting ? (<Spinner size={'sm'} />) : ("Submit")
-              }
+              {submitting ? <Spinner size={"sm"} /> : "Submit"}
             </Button>
           </div>
         </form>
       )}
+      <div className="max-w-3xl mx-auto w-full p-3">
+        <div className="flex items-center gap-2 my-3">
+          <span>Comments</span>
+          <div className="flex border w-8 h-8 item-center justify-center rounded-sm">
+            <span style={{ lineHeight: 1.75 }}>
+              {commentsRes && commentsRes.length}
+            </span>
+          </div>
+        </div>
+        <div className="my-3">
+          {commentsRes &&
+            commentsRes.map((comment) => {
+              return <CommentCard comment={comment} key={comment._id || Math.random()} />;
+            })}
+        </div>
+      </div>
     </div>
   );
 };
