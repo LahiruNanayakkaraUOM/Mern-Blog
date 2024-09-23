@@ -1,10 +1,17 @@
-import { Button, Rating, RatingStar, Spinner, Textarea } from "flowbite-react";
+import {
+  Button,
+  Modal,
+  Rating,
+  RatingStar,
+  Spinner,
+  Textarea,
+} from "flowbite-react";
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { FaThumbsUp } from "react-icons/fa";
 import { useSelector } from "react-redux";
 
-const CommentCard = ({ commentVal, onLike, onEdit }) => {
+const CommentCard = ({ commentVal, onLike, onEdit, onDelete }) => {
   const [user, setUser] = useState(null);
   const { currentUser } = useSelector((state) => state.user);
   const [isEditable, setIsEditable] = useState(false);
@@ -149,7 +156,7 @@ const CommentCard = ({ commentVal, onLike, onEdit }) => {
                 {commentVal.noOfLikes > 0 && commentVal.noOfLikes + " Likes"}
               </span>
               {((currentUser && currentUser._id === commentVal.userId) ||
-                currentUser.isAdmin) && (
+                (currentUser && currentUser.isAdmin)) && (
                 <span
                   onClick={() => {
                     setIsEditable(!isEditable);
@@ -157,6 +164,17 @@ const CommentCard = ({ commentVal, onLike, onEdit }) => {
                   className="text-xs hover:text-blue-500 cursor-pointer"
                 >
                   Edit
+                </span>
+              )}
+              {((currentUser && currentUser._id === commentVal.userId) ||
+                (currentUser && currentUser.isAdmin)) && (
+                <span
+                  onClick={() => {
+                    onDelete(commentVal._id);
+                  }}
+                  className="text-xs hover:text-red-500 cursor-pointer"
+                >
+                  Delete
                 </span>
               )}
             </div>
