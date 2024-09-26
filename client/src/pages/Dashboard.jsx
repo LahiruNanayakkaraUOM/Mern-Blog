@@ -4,6 +4,7 @@ import Sidebar from "../components/DashSidebar";
 import Profile from "./Profile";
 import Posts from "./Posts";
 import Users from "./Users";
+import DashComments from "./DashComments";
 
 export default function Dashboard() {
 
@@ -27,6 +28,7 @@ export default function Dashboard() {
         { tab === 'profile' && <Profile className="" /> }
         { tab === 'posts' && <Posts className="" /> }
         { tab === 'users' && <Users className="" /> }
+        { tab === 'comments' && <DashComments className="" /> }
       </div>
     </div>
   )
