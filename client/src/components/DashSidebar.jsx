@@ -1,5 +1,12 @@
 import { Sidebar } from "flowbite-react";
-import { HiUser, HiArrowSmRight, HiDocumentText, HiUserGroup, HiChat } from "react-icons/hi";
+import {
+  HiUser,
+  HiArrowSmRight,
+  HiDocumentText,
+  HiUserGroup,
+  HiChat,
+  HiHome,
+} from "react-icons/hi";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -44,6 +51,16 @@ const DashSidebar = () => {
     <Sidebar className="w-full">
       <Sidebar.Items>
         <Sidebar.ItemGroup className="flex flex-col">
+          <Link to={"/dashboard?tab=overview"}>
+            <Sidebar.Item
+              active={tab === "overview" || !tab}
+              icon={HiHome}
+              labelColor="dark"
+              as="div"
+            >
+              Overview
+            </Sidebar.Item>
+          </Link>
           <Link to={"/dashboard?tab=profile"}>
             <Sidebar.Item
               active={tab === "profile"}
