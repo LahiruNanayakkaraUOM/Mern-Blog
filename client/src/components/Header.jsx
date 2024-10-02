@@ -100,9 +100,11 @@ export default function Header() {
           }}
         />
       </form>
-      <Button className="w-12 h-10 lg:hidden" color="gray" pill>
-        <AiOutlineSearch className="self-center"></AiOutlineSearch>
-      </Button>
+      <Link to={'/search'}>
+        <Button className="w-12 h-10 lg:hidden" color="gray" pill>
+          <AiOutlineSearch className="self-center"></AiOutlineSearch>
+        </Button>
+      </Link>
       <div className="flex gap-2 md:order-2">
         <Button
           className="w-12 h-10 hidden sm:inline"

@@ -12,6 +12,7 @@ const Search = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [totalPosts, setTotalPosts] = useState(0);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const Search = () => {
     if (searchTermFromUrl || sortFromUrl || categoryFromUrl) {
       setSidebarData({
         ...sidebarData,
-        searchTerm: searchTermFromUrl,
+        searchTerm: searchTermFromUrl || "",
         sort: sortFromUrl,
         category: categoryFromUrl,
       });
@@ -41,6 +42,7 @@ const Search = () => {
         if (res.ok) {
           setLoading(false);
           setPosts(data.posts);
+          setTotalPosts(data.totalPosts);
           if (data.posts.length === 9) {
             setShowMore(true);
           } else {
@@ -110,6 +112,12 @@ const Search = () => {
     }
   };
 
+  useEffect(() => {
+    if (posts.length === totalPosts) {
+      setShowMore(false);
+    }
+  }, [handleShowMore]);
+
   return (
     <div className="flex flex-col md:flex-row">
       <div className="p-7 border-b md:border-r md:min-h-screen border-gray-500">
@@ -161,7 +169,7 @@ const Search = () => {
           )}
           {loading && (
             <div className="w-full flex items-center justify-center">
-              <Spinner className="mt-48" />
+              <Spinner className="my-20 md:my-48" />
             </div>
           )}
           {!loading &&

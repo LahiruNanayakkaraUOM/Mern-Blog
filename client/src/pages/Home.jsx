@@ -27,7 +27,7 @@ export default function Home() {
   }, []);
   return (
     <div className="">
-      <div className="flex flex-col md:flex-row items-center justify-center px-28 py-20 max-w-5xl mx-auto">
+      <div className="flex flex-col md:flex-row items-center justify-center px-10 md:px-28 py-20 max-w-5xl mx-auto">
         <div className="flex flex-col gap-8">
           <h1 className="text-4xl lg:text-6xl font-bold">Welcome to My Blog</h1>
           <p className="md:max-w-md md:text-[18px]">
@@ -55,7 +55,7 @@ export default function Home() {
               return <PostCard key={post._id} post={post} />;
             })}
         </div>
-        <Link to={"/search"} className="text-lg text-teal-500 hover:underline">
+        <Link to={"/blogs"} className="text-lg text-teal-500 hover:underline">
           View All Posts
         </Link>
       </div>
